@@ -1,7 +1,7 @@
 # ORMIR_XCT
 
-**By:** [Michael T. Kuczynski](https://www.linkedin.com/in/mkuczyns/), [Nathan J. Neeteson](https://www.linkedin.com/in/nathan-neeteson/), [Kathryn S. Stok](https://www.linkedin.com/in/kstok/), [Andrew J. Burghardt](https://www.linkedin.com/in/aburghardt/), [Michelle A. Espinosa Hernandez](https://www.linkedin.com/in/michelleaespinosah/), [Jared Vicory](https://www.kitware.com/jared-vicory/), [Justin J. Tse](https://www.linkedin.com/in/justin-j-tse/), [Pholpat Durongbhan](https://www.linkedin.com/in/pholpatd/), [Serena Bonaretti](https://sbonaretti.github.io/), [Andy Kin On Wong](https://www.linkedin.com/in/andy-kin-on-wong-76408859/), [Steven K. Boyd](https://mccaig.ucalgary.ca/boyd), [Sarah L. Manske](https://www.linkedin.com/in/sarah-manske-b5402b41/), 2023  
-**Version:** 1.0
+**By:** [Michael T. Kuczynski](https://www.linkedin.com/in/mkuczyns/), [Nathan J. Neeteson](https://www.linkedin.com/in/nathan-neeteson/), [Kathryn S. Stok](https://www.linkedin.com/in/kstok/), [Andrew J. Burghardt](https://www.linkedin.com/in/aburghardt/), [Michelle A. Espinosa Hernandez](https://www.linkedin.com/in/michelleaespinosah/), [Jared Vicory](https://www.kitware.com/jared-vicory/), [Justin J. Tse](https://www.linkedin.com/in/justin-j-tse/), [Pholpat Durongbhan](https://www.linkedin.com/in/pholpatd/), [Serena Bonaretti](https://sbonaretti.github.io/), [Andy Kin On Wong](https://www.linkedin.com/in/andy-kin-on-wong-76408859/), [Steven K. Boyd](https://mccaig.ucalgary.ca/boyd), [Sarah L. Manske](https://www.linkedin.com/in/sarah-manske-b5402b41/), 2024
+**Version:** 1.0.1
 
 - ORMIR_XCT is a Python package for processing high resolution peripheral computed tomography (HR-pQCT) scans. 
 - Development of this project began during the “Building the Jupyter Community in Musculoskeletal Imaging Research” workshop hosted by the Open and Reproducible Musculoskeletal Imaging Research (ORMIR) group.
@@ -27,7 +27,7 @@ The modules in the `ormir_xct` directory can now be run. Examples for each modul
 ---
 
 ## Example Jupyter Notebooks
-- Example Jupyter Notebooks demonstrating the major functionality of the ORMIR_XCT package are provided in the *[examples](https://github.com/SpectraCollab/ORMIR_XCT/tree/main/examples)* directory.
+- Example Jupyter Notebooks demonstrating the major functionality of the ORMIR_XCT package are provided in the *[examples](https://github.com/ORMIR-XCT/ORMIR_XCT/tree/main/examples)* directory.
 
 ---
 
