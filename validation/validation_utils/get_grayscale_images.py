@@ -36,18 +36,19 @@ def save_as_yaml(image_paths: List[Path], outpath: Path) -> None:
     Returns:
         None
     """
-    # Extract IDs from filenames (part before underscore)
-    image_ids = [path.name.split("_")[0] for path in image_paths]
-
     # Create mapping of IDs to full paths
     id_to_path = {path.name.split("_")[0]: str(path) for path in image_paths}
 
-    yaml_dict = {"images": {"grayscale_filenames": image_ids, "folder_id": id_to_path}}
+    yaml_dict = {
+        "hydra": {"output_subdir": None},
+        "images": {
+            "grayscale_filenames": list(id_to_path.keys()),
+            "folder_id": id_to_path,
+        },
+    }
 
     with open(outpath, "w") as f:
         yaml.safe_dump(yaml_dict, f, default_flow_style=False, sort_keys=False)
-
-    return None
 
 
 def save_ids_to_txt(image_paths: List[Path], outpath: Path) -> None:
