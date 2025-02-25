@@ -13,7 +13,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --mem-per-cpu=8G
 #SBATCH --tmp=50G
-#SBATCH --array=1-1045%50
+#SBATCH --array=1-10%50
 
 # Workdir
 #SBATCH --chdir=/storage/workspaces/artorg_msb/hpc_abaqus/poncioni/TOOLS/ORMIR_XCT/validation/
@@ -23,11 +23,12 @@
 ##############################################################################################################
 ### Load modules
 HPC_WORKSPACE=hpc_abaqus module load Workspace
+module load Anaconda3
 
 unset SLURM_GTIDS
 
 ### greyscale_filenames.txt contains lines with 1 greyscale_filename per line.
-greyscale_filenames=/storage/workspaces/artorg_msb/hpc_abaqus/poncioni/TOOLS/ORMIR_XCT/validation/filenames.txt
+greyscale_filenames=/storage/workspaces/artorg_msb/hpc_abaqus/poncioni/TOOLS/ORMIR_XCT/validation/validation_utils/filenames.txt
 
 ### Line <i> contains greyscale_filename for run <i>
 # Get greyscale_filename                                                                                                                                  
@@ -37,4 +38,4 @@ greyscale_filename=$(cat $greyscale_filenames | awk -v var=$SLURM_ARRAY_TASK_ID 
 n=$(printf "%04d" $SLURM_ARRAY_TASK_ID)
 
 # Run command
-/bin/bash -c "source /opt/miniconda/etc/profile.d/conda.sh && conda activate ormir_xct && python run_validation.py images.grayscale_filenames=$greyscale_filename"
+eval "$(conda shell.bash hook)" && conda activate ormir_xct && python run_validation.py images.grayscale_filenames=$greyscale_filename
