@@ -45,7 +45,9 @@ def save_dict_to_csv(results_dict, output_dir="validation"):
     config_name="config_validation",
 )
 def validation_runner(cfg: DictConfig) -> None:
-    impath = Path(cfg.images.grayscale_filenames)
+    image = cfg.images.grayscale_filenames
+    impath = Path(cfg.images.folder_id[image])
+    # impath = Path(cfg.images.grayscale_filenames)
     trabmask_path = impath.parent / impath.name.replace("UNCOMP", "TRAB_MASK_UNCOMP")
     cortmask_path = impath.parent / impath.name.replace("UNCOMP", "CORT_MASK_UNCOMP")
 
