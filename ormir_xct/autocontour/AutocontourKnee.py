@@ -91,26 +91,33 @@ class AutocontourKnee:
     def __init__(
         self,
         in_value=127,
-        peri_s1_sigma=1.5,
+        # peri_s1_sigma=1.5,
+        peri_s1_sigma=0.8,
         peri_s1_support=1,
-        peri_s1_lower=350,  # 919, # was 350 mgHA/ccm
+        # peri_s1_lower=350,  # 919, # was 350 mgHA/ccm
+        peri_s1_lower=320,  # 919, # was 350 mgHA/ccm
         peri_s1_upper=10000,  # very high value
         peri_s1_radius=35,
-        peri_s2_sigma=1.5,
+        peri_s2_sigma=0.8,
         peri_s2_support=1,
-        peri_s2_lower=250,  # 660, # was 250 mgHA/ccm
+        # peri_s2_lower=250,  # 660, # was 250 mgHA/ccm
+        peri_s2_lower=320,  # 660, # was 250 mgHA/ccm
         peri_s2_upper=10000,
         peri_s2_radius=10,
-        peri_s3_sigma=1.5,
+        peri_s3_sigma=0.8,
         peri_s3_support=1,
-        peri_s3_lower=350,  # 919, # was 350 mgHA/ccm
+        # peri_s3_lower=350,  # 919, # was 350 mgHA/ccm
+        peri_s3_lower=320,  # 919, # was 350 mgHA/ccm
         peri_s3_upper=10000,  # very high value
         peri_s3_radius=5,
         peri_s4_open_radius=8,
         peri_s4_close_radius=16,
-        endo_sigma=2,
-        endo_support=3,
-        endo_lower=550,  # 1444, # was 550 mg HA/ccm
+        # endo_sigma=2,
+        endo_sigma=0.8,
+        # endo_support=3,
+        endo_support=1,
+        # endo_lower=550,  # 1444, # was 550 mg HA/ccm
+        endo_lower=450,  # 1444, # was 550 mg HA/ccm
         endo_upper=10000,
         endo_min_cort_th=4,
         endo_open_radius=3,
@@ -486,7 +493,8 @@ class AutocontourKnee:
         img_conn = sitk.ConnectedComponent(img_segmented, img_segmented, True)
         img_conn = sitk.RelabelComponent(img_conn, sortByObjectSize=True)
         img_segmented = self.in_value * (img_conn == component)
-        # img_segmented = self._get_largest_connected_component(img_segmented)
+        # TO DO: _get_largest_connected_component should be called as a fct argument
+        img_segmented = self._get_largest_connected_component(img_segmented)
 
         # dilation
         # !!!NOTE: I'm using a Euclidean metric for the structirng element,

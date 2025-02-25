@@ -1,0 +1,6 @@
+hydra:
+  output_subdir: null
+
+images:
+  grayscale_filenames:
+    '/home/simoneponcioni/Documents/02_PROJECTS/2025-ormir-xct/ORMIR_XCT/validation/img/00001702/C0001657_UNCOMP.AIM'
