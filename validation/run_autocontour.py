@@ -5,7 +5,7 @@ import SimpleITK as sitk
 from image_reader import ImageReader
 from matplotlib import pyplot as plt
 
-from ormir_xct.autocontour.autocontour import autocontour
+from ormir_xct.autocontour.exec_autocontour import autocontour
 from ormir_xct.util.segmentation_evaluation import (calculate_dice_and_jaccard,
                                                     hausdorff_sitk)
 

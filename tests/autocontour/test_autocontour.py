@@ -11,28 +11,30 @@ import os
 import shutil
 import tempfile
 import unittest
+
 import numpy as np
 import SimpleITK as sitk
 
-from ormir_xct.autocontour.autocontour import autocontour
+from ormir_xct.autocontour.exec_autocontour import autocontour
 
 
 class TestAutocontour(unittest.TestCase):
     def setUp(self):
         self.true_mask_filename = "test_joint_mask.nii"
         self.true_image_filename = "test_joint.nii"
-        self.path = os.getcwd()
-        self.parent = os.path.dirname(self.path)
-        self.filepath = os.path.join(self.parent, "data")
 
-        # Create a temp directory
-        self.test_dir = tempfile.mkdtemp()
+        # Dynamically determine the correct directory
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        data_dir = os.path.join(base_dir, "..", "data")
 
         # Filepath for test data
-        self.true_joint_image = os.path.join(self.filepath, self.true_image_filename)
-        self.true_joint_mask = os.path.join(self.filepath, self.true_mask_filename)
+        self.true_joint_image = os.path.join(data_dir, self.true_image_filename)
+        self.true_joint_mask = os.path.join(data_dir, self.true_mask_filename)
 
-        # Create a test joint image that is a copy
+        # Create a temporary directory
+        self.test_dir = tempfile.mkdtemp()
+
+        # Filepath for test joint image in temp directory
         self.test_image = os.path.join(self.test_dir, self.true_image_filename)
 
         # Copy test data to temp directory

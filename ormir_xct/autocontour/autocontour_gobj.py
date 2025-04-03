@@ -5,11 +5,12 @@ provide the distal and proximal GOBJ masks (as NIFTI or similar) to mask
 out the bone of interest.
 """
 
-import os
 import argparse
-import SimpleITK as sitk
+import os
 
-from AutocontourKnee import AutocontourKnee
+import SimpleITK as sitk
+from autocontour import Autocontour
+
 from ormir_xct.util.scanco_rescale import convert_hu_to_bmd
 
 
@@ -58,7 +59,7 @@ def main():
     prx_masked_image = sitk.Mask(image_bmd, prx_gobj)
 
     # Run the autocontour method for each bone
-    auto_contour = AutocontourKnee()
+    auto_contour = Autocontour()
     prx_mask = auto_contour.get_periosteal_mask(dst_masked_image, 1)
     dst_mask = auto_contour.get_periosteal_mask(prx_masked_image, 1)
 
