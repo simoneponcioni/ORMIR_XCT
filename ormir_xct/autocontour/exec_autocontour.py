@@ -4,16 +4,19 @@ import os
 import SimpleITK as sitk
 
 from ormir_xct.autocontour.autocontour import Autocontour
-from ormir_xct.util.scanco_rescale import convert_hu_to_bmd
 
 
-def autocontour(
-    img, mu_water=0.2409, rescale_slope=1603.51904, rescale_intercept=-391.209015
-):
-    # Mu_Water, Rescale_Slope, and Rescale_Intercept are hard coded
-    # To-Do: get directly from the image, if possible, or from the user
-    img = convert_hu_to_bmd(img, mu_water, rescale_slope, rescale_intercept)
+def autocontour(img):
+    """
+    Perform autocontouring on the image data. Assumes the image is already in BMD format.
 
+    Args:
+        img: The input image data in BMD format.
+
+    Returns:
+        A tuple containing the distal mask, proximal mask, and combined mask.
+    """
+    # Perform autocontouring
     auto_contour = Autocontour()
     prx_mask = auto_contour.get_periosteal_mask(img, 1)
     dst_mask = auto_contour.get_periosteal_mask(img, 2)

@@ -609,7 +609,7 @@ class Autocontour:
         Parameters
         ----------
         img : sitk.Image
-            The gray-scale AIM. Currently this is written for images in HU,
+            The gray-scale AIM. Currently this is written for images in BMD,
             if you want to input a density image then you'll need to modify
             the lower and upper thresholds to be in the correct units.
 
