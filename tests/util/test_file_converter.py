@@ -8,14 +8,15 @@ Description: Test file type conversion.
 """
 
 import os
-import itk
 import shutil
 import tempfile
 import unittest
+
+import itk
 import SimpleITK as sitk
 
-from ormir_xct.util.sitk_itk import itk_sitk
 from ormir_xct.util.file_converter import file_converter
+from ormir_xct.util.sitk_itk import itk_sitk
 
 
 class TestFileConverter(unittest.TestCase):
@@ -30,8 +31,10 @@ class TestFileConverter(unittest.TestCase):
         ]
 
         self.path = os.getcwd()
-        self.parent = os.path.dirname(self.path)
-        self.filepath = os.path.join(self.parent, "data")
+        # self.parent = os.path.dirname(self.path)
+        # self.filepath = os.path.join(self.parent, "tests", "data")
+        self.parent = os.path.dirname(os.path.abspath(__file__))
+        self.filepath = os.path.join(self.parent, "..", "data")
 
         # Create a temp directory
         self.test_dir = tempfile.mkdtemp()

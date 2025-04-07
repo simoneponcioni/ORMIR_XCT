@@ -9,6 +9,7 @@ Description: Test the file reader.
 
 import os
 import unittest
+
 import SimpleITK as sitk
 
 from ormir_xct.util.file_reader import file_reader
@@ -25,8 +26,8 @@ class TestFileReader(unittest.TestCase):
     ]
 
     path = os.getcwd()
-    parent = os.path.dirname(path)
-    filepath = os.path.join(parent, "data")
+    parent = os.path.dirname(os.path.abspath(__file__))
+    filepath = os.path.join(self.parent, "..", "data")
 
     def test_file_read_aim(self):
         aim_path = os.path.join(self.filepath, self.filenames[0] + ".AIM")

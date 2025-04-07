@@ -16,6 +16,8 @@ import numpy as np
 import SimpleITK as sitk
 
 from ormir_xct.autocontour.exec_autocontour import autocontour
+from ormir_xct.util.converters_rescale import ImageConverter
+from ormir_xct.util.img_types import ImageType
 
 
 class TestAutocontour(unittest.TestCase):
@@ -80,6 +82,20 @@ class TestAutocontour(unittest.TestCase):
     def test_autocontour(self):
         true_joint_mask = sitk.ReadImage(self.true_joint_mask, sitk.sitkUInt8)
         test_joint_image = sitk.ReadImage(self.test_image, sitk.sitkFloat32)
+        
+        # Scanner- and calibration-dependent parameters
+        mu_scaling = 8192  # Scanco XCTII
+        mu_water = 0.2409
+        rescale_slope = 1603.51904
+        rescale_intercept = -391.209015
+
+        # Initialize the ImageConverter with the scanner parameters
+        conv = ImageConverter(mu_scaling, mu_water, rescale_slope, rescale_intercept)
+        from_type = ImageType.HU
+
+        # The autocontour function requires the image to be in BMD format, convert if needed
+        if from_type != ImageType.BMD:
+            test_joint_image = conv.convert(test_joint_image, from_type, ImageType.BMD)
         dst_mask, prx_mask, mask = autocontour(test_joint_image)
 
         self.spacing_check(true_joint_mask, mask)
