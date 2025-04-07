@@ -455,16 +455,18 @@ class Autocontour:
 
         return self.in_value * (img_cl_min > 0)
 
-    def get_periosteal_mask(self, img, component):
+    def get_periosteal_mask(self, img, component=1):
         """
         Compute the periosteal mask from an input image.
 
         Parameters
         ----------
         img : sitk.Image
-            The gray-scale AIM. Currently this is written for images in HU,
+            The gray-scale AIM. Currently this is written for images in BMD,
             if you want to input a density image then you'll need to modify
             the lower and upper thresholds to be in the correct units.
+        component: int
+            The label of the connected component to retain, sorted by size, where 1 corresponds to the largest component. Default is 1.
 
         Returns
         -------
@@ -711,7 +713,7 @@ class Autocontour:
         # In the IPL script this operation is done again with the following comment:
         # ! CL to handle case where dilation of null AIM give a full AIM
         # in this script repeating this operation with a different max region size
-        # would not do anything do it is ommitted
+        # would not do anything do it is omitted
         trab = sitk.Or(trab, trab_open)
         trab = sitk.Or(trab, corners)
 
@@ -741,7 +743,7 @@ class Autocontour:
         Parameters
         ----------
         img : sitk.Image
-            The gray-scale AIM. Currently this is written for images in HU,
+            The gray-scale AIM. Currently this is written for images in BMD,
             if you want to input a density image then you'll need to modify
             the lower and upper thresholds to be in the correct units.
 
@@ -751,7 +753,12 @@ class Autocontour:
             Tuple of two binary images. The first image is the periosteal mask
             and the second image is the endosteal mask.
         """
-        pass
+        auto_contour = Autocontour()
+        print("Getting periosteal mask")
+        peri_mask = auto_contour.get_periosteal_mask(img, 1)
+        print("Getting endosteal mask")
+        endo_mask = auto_contour.get_endosteal_mask(img, peri_mask)
+        return peri_mask, endo_mask
 
     def __str__(self):
         return f"Autocontour object (--str to be implemented--)."
