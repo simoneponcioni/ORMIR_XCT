@@ -67,7 +67,9 @@ def save_ids_to_txt(image_paths: List[Path], outpath: Path) -> None:
 
 
 def main():
-    data_dir = Path("absolute/path/to/data")
+    data_dir = Path(
+        "/home/simoneponcioni/Documents/02_PROJECTS/2025-ormir-xct/ORMIR_XCT/validation/img"
+    )
     yaml_outpath = Path(__file__).parent / "config_validation.yaml"
     txt_outpath = Path(__file__).parent / "filenames.txt"
 
