@@ -31,7 +31,6 @@ def main():
     # Now you can use the methods
     # Components = how many bones are present in the image
     # (e.g., prox and dist)
-    # TODO: now prx + dst are summed, it would be better to distinguish them
     gray_img.segment(components=2)
 
     # Access the segmentation results
