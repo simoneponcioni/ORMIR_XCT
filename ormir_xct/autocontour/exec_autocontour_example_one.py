@@ -4,16 +4,44 @@ import numpy as np
 import SimpleITK as sitk
 from matplotlib import pyplot as plt
 
-from ormir_xct.autocontour.exec_autocontour import autocontour
+from ormir_xct.autocontour.autocontour import Autocontour
 from ormir_xct.util.converters_rescale import ImageConverter
 from ormir_xct.util.img_types import ImageType
 from ormir_xct.util.segmentation_evaluation import (calculate_dice_and_jaccard,
                                                     hausdorff_sitk)
 
 
+def autocontour(img):
+    """
+    Perform autocontouring on the image data. Assumes the image is already in BMD format.
+
+    Args:
+        img: The input image data in BMD format.
+
+    Returns:
+        A tuple containing the distal mask, proximal mask, and combined mask.
+    """
+    # Perform autocontouring
+    auto_contour = Autocontour()
+    prx_mask = auto_contour.get_periosteal_mask(img, 1)
+    dst_mask = auto_contour.get_periosteal_mask(img, 2)
+
+    # Create a mask for the entire joint
+    mask = prx_mask + dst_mask
+    
+    mask_np = sitk.GetArrayFromImage(mask)
+    plt.figure()
+    plt.imshow(mask_np[mask_np.shape[0] // 2, :, :], cmap='gray')
+    plt.title("Combined Mask")
+    plt.axis('off')
+    plt.show()
+
+    return dst_mask, prx_mask, mask
+
+
 def main():
-    joint_seg_path = os.path.join("examples/images", "GRAY_JOINT.nii")
-    joint_seg_ipl_path = os.path.join("examples/images", "AUTOCONTOUR_IPL.nii")
+    joint_seg_path = os.path.join("ORMIR_XCT/examples/images", "GRAY_JOINT.nii")
+    joint_seg_ipl_path = os.path.join("ORMIR_XCT/examples/images", "AUTOCONTOUR_IPL.nii")
     output_path = "images"
     print('reading images')
     print(os.getcwd())
@@ -42,6 +70,7 @@ def main():
     # Call the autocontour function with the converted image
     dst_mask, prx_mask, ormir_mask = autocontour(bmd_img)
     return dst_mask, prx_mask, ormir_mask
+
 
 if __name__ == "__main__":
     dst_mask, prx_mask, ormir_mask = main()

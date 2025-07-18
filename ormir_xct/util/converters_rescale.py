@@ -7,6 +7,7 @@ from ormir_xct.util.scanco_rescale import (
     convert_linear_attenuation_to_scanco, convert_scanco_to_bmd,
     convert_scanco_to_hu, convert_scanco_to_linear_attenuation)
 
+# flake8: noqa: E501
 
 class ImageConverter:
     """Handles conversion between different image types using scanco_rescale.py functions."""
