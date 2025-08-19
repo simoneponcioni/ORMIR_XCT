@@ -1,6 +1,7 @@
 import SimpleITK as sitk
-
-# import yaml
+from ormir_xct.util.hildebrand_thickness import calc_structure_thickness_statistics
+import numpy as np
+from ormir_xct.segmentation.ipl_seg import ipl_seg
 
 
 class Autocontour:
@@ -118,6 +119,8 @@ class Autocontour:
         endo_open_close_radius: int = 15,
         endo_corner_open_radius: int = 3,
         endo_close_radius: int = 50,
+        voxel_size: tuple = (0.061, 0.061, 0.061),  # in mm
+        kernel_radius: tuple = (15, 15, 15),
     ):
         """
         Initialization method.
@@ -231,6 +234,9 @@ class Autocontour:
 
         endo_close_radius : int
 
+        voxel_size : tuple[float, float, float]
+            The voxel size of the input image in mm.
+            Default is (0.061, 0.061, 0.061).
         """
 
         self.in_value = in_value
@@ -270,6 +276,8 @@ class Autocontour:
 
         self.DEFAULT_MAX_ERROR = 0.01
         self.USE_SPACING = False
+        self.voxel_size = voxel_size  # in mm
+        self.kernel_radius = kernel_radius  # in voxels
 
     def _gaussian_and_threshold(self, img, sigma, support, lower, upper):
         """
@@ -604,7 +612,7 @@ class Autocontour:
 
         return peri_mask
 
-    def get_endosteal_mask(self, img, peri):
+    def get_endosteal_mask_oldversion(self, img, peri):
         """
         Compute the endosteal mask from the image and periosteal mask.
 
@@ -736,6 +744,108 @@ class Autocontour:
 
         return cort
 
+    def get_endosteal_mask(self, img, peri):
+        """
+        # ! WORK IN PROGRESS
+        Authors: M. Kuczynski, S. Poncioni
+        Compute the endosteal mask from the image and periosteal mask as per Burghardt et al. 2010 (Bone)
+        """
+
+        def __binarize__(img, upperThreshold):
+            """
+            Ensure the input image is binary.
+            """
+            return sitk.BinaryThreshold(img, 1, upperThreshold, 1, 0)
+
+        def __img_mask__(img, mask):
+            """
+            Mask the input image with the provided mask.
+            """
+            return sitk.Mask(img, mask)
+
+        def __get_marrow_voxels__(inverted_bone_image, peri):
+            """
+            # TODO: write docstring
+            Multiply the inverted bone image with the periosteal mask to get the marrow voxels.
+            """
+            marrow_voxels = inverted_bone_image * peri
+            return marrow_voxels
+
+        def trab_seg(gray, peri):
+            # Make sure the periosteal mask has a value of 1
+            peri = __binarize__(peri, 255)
+            masked_bone = __img_mask__(gray, peri)
+
+            # Threshold in HU
+            # TODO: generalize this step to work with different units
+            lower_threshold_s = int(0.2 * max(sitk.GetArrayFromImage(gray).flatten()))
+            upper_threshold_s = 10000
+            ipl_seg_trab = ipl_seg(
+                masked_bone, lower_threshold_s, upper_threshold=upper_threshold_s
+            )
+
+            ipl_seg_trab = __binarize__(ipl_seg_trab, 127)
+            return peri, ipl_seg_trab
+
+        def __get_largest_connected_component__(img):
+            connected_components = sitk.ConnectedComponent(img)
+            largest_component = (
+                sitk.RelabelComponent(connected_components, sortByObjectSize=True) == 1
+            )
+            return largest_component
+
+        def threshold_marrow_thickness(
+            largest_component, marrow_voxels, voxel_size=0.0607
+        ):
+            largest_component_np = sitk.GetArrayFromImage(largest_component)
+            thickness_map = calc_structure_thickness_statistics(
+                largest_component_np, voxel_size, 0, oversample=False, skeletonize=False
+            )[4]
+            mask_thick = thickness_map >= 3 * voxel_size
+            marrow_thickness = sitk.GetImageFromArray(mask_thick.astype(np.float32))
+            marrow_thickness.CopyInformation(marrow_voxels)
+            filtered_marrow_voxels = marrow_voxels * sitk.Cast(
+                marrow_thickness, sitk.sitkUInt8
+            )
+            return marrow_thickness, filtered_marrow_voxels
+
+        def __binary_dilate__(image, kernel_radius: tuple):
+            """
+            Fast binary dilation of a single intensity value in the image.
+            """
+            # TODO: check if image is binary
+            return sitk.BinaryDilate(image, kernelRadius=kernel_radius)
+
+        def __binary_erosion__(image, kernel_radius: tuple):
+            """
+            Fast binary erosion of a single intensity value in the image.
+            """
+            return sitk.BinaryErode(image, kernelRadius=kernel_radius)
+
+        def extract_cortical_compartment(periosteal_mask, endosteal_mask):
+            cortical_compartment = periosteal_mask - endosteal_mask
+            cortical_compartment += periosteal_mask - sitk.BinaryErode(
+                periosteal_mask, (3, 3, 3)
+            )
+            cortical_compartment = __binarize__(cortical_compartment, 255)
+            return cortical_compartment
+
+        peri, ipl_seg_trab = trab_seg(img, peri)
+
+        inverted_bone_image = sitk.InvertIntensity(ipl_seg_trab, maximum=1)
+        marrow_voxels = __get_marrow_voxels__(inverted_bone_image, peri)
+        largest_component = __get_largest_connected_component__(marrow_voxels)
+        marrow_thickness, filtered_marrow_voxels = threshold_marrow_thickness(
+            largest_component, marrow_voxels, self.voxel_size[0]
+        )
+        dilated_marrow = __binary_dilate__(filtered_marrow_voxels, self.kernel_radius)
+        largest_dilated_component = __get_largest_connected_component__(dilated_marrow)
+        endosteal_surface = __binary_erosion__(
+            largest_dilated_component, self.kernel_radius
+        )
+        cortical_compartment = extract_cortical_compartment(peri, endosteal_surface)
+        return cortical_compartment, endosteal_surface
+
     def get_masks(self, img):
         """
         Combined method to compute both the periosteal and endosteal masks.
@@ -757,8 +867,8 @@ class Autocontour:
         print("Getting periosteal mask")
         peri_mask = auto_contour.get_periosteal_mask(img, 1)
         print("Getting endosteal mask")
-        endo_mask = auto_contour.get_endosteal_mask(img, peri_mask)
-        return peri_mask, endo_mask
+        cort_mask, endosteal_surface = auto_contour.get_endosteal_mask(img, peri_mask)
+        return peri_mask, cort_mask, endosteal_surface
 
     def __str__(self):
         return f"Autocontour object (--str to be implemented--)."
