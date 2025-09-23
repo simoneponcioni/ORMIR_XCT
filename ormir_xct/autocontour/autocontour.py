@@ -483,7 +483,6 @@ class Autocontour:
         """
 
         # STEP 1: Mask out the largest bone only
-
         img_segmented = self._gaussian_and_threshold(
             img,
             self.peri_s1_sigma,
@@ -498,11 +497,13 @@ class Autocontour:
         img_segmented = self.in_value * (img_conn == component)
         # img_segmented = self._get_largest_connected_component(img_segmented)
 
+        segmented_img = img_segmented
+
         # dilation
-        # !!!NOTE: I'm using a Euclidean metric for the structirng element,
-        # the IPL implementation uses the 3-4-5 chamfer metric. Feel free to
-        # swap out the code if you can figure out how to get the 3-4-5
-        # chamfer metric in SimpleITK
+        # ! NOTE: I'm using a Euclidean metric for the structirng element,
+        # ! the IPL implementation uses the 3-4-5 chamfer metric.
+        # ! Feel free to swap out the code if you can figure out how
+        # ! to get the 3-4-5 chamfer metric in SimpleITK
 
         img_segmented = sitk.BinaryDilate(
             img_segmented,
@@ -610,7 +611,7 @@ class Autocontour:
         # step 1
         peri_mask = sitk.Mask(peri_mask, img_segmented_s1)
 
-        return peri_mask
+        return segmented_img, peri_mask
 
     def get_endosteal_mask_oldversion(self, img, peri):
         """
@@ -865,10 +866,10 @@ class Autocontour:
         """
         auto_contour = Autocontour()
         print("Getting periosteal mask")
-        peri_mask = auto_contour.get_periosteal_mask(img, 1)
+        segmented_img, peri_mask = auto_contour.get_periosteal_mask(img, 1)
         print("Getting endosteal mask")
         cort_mask, endosteal_surface = auto_contour.get_endosteal_mask(img, peri_mask)
-        return peri_mask, cort_mask, endosteal_surface
+        return segmented_img, peri_mask, cort_mask, endosteal_surface
 
     def __str__(self):
         return f"Autocontour object (--str to be implemented--)."

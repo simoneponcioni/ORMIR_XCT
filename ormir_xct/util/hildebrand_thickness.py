@@ -19,7 +19,7 @@ from scipy.ndimage.morphology import (
     binary_dilation,
     distance_transform_edt,
 )
-from skimage.morphology import skeletonize_3d
+from skimage.morphology import skeletonize
 from typing import Optional, Union
 import warnings
 
